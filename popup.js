@@ -1,20 +1,17 @@
-// Popup script
+
 document.addEventListener('DOMContentLoaded', () => {
   loadClipboardItems();
   
-  // Clear all button
   document.getElementById('clearAll').addEventListener('click', () => {
     if (confirm('Are you sure you want to clear all clipboard items?')) {
       chrome.storage.local.set({ clipboardItems: [] });
       loadClipboardItems();
       
-      // Notify background script
       chrome.runtime.sendMessage({ action: 'clearAll' });
     }
   });
 });
 
-// Load and display clipboard items
 async function loadClipboardItems() {
   const result = await chrome.storage.local.get(['clipboardItems']);
   const items = result.clipboardItems || [];
@@ -48,16 +45,15 @@ async function loadClipboardItems() {
     container.appendChild(itemElement);
   });
   
-  // Add click listeners to paste buttons
+
   document.querySelectorAll('.paste-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const index = parseInt(e.target.dataset.index);
-      pasteItem(index + 1);
+      pasteItem(index + 1); 
     });
   });
 }
 
-// Paste specific item
 async function pasteItem(itemNumber) {
   try {
     const result = await chrome.storage.local.get(['clipboardItems']);
@@ -67,12 +63,10 @@ async function pasteItem(itemNumber) {
       return;
     }
     
-    const text = items[itemNumber - 1];
+    const text = items[itemNumber - 1]; 
     
-    // Get active tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     
-    // Execute paste script
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: (textToPaste) => {
@@ -98,7 +92,6 @@ async function pasteItem(itemNumber) {
       args: [text]
     });
     
-    // Close popup after pasting
     window.close();
     
   } catch (error) {
@@ -106,14 +99,12 @@ async function pasteItem(itemNumber) {
   }
 }
 
-// Escape HTML to prevent XSS
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-// Listen for storage changes
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && changes.clipboardItems) {
     loadClipboardItems();

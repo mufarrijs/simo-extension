@@ -1,12 +1,8 @@
-// ok basically this is the file that tells chrome what my extension is called
-// what it can do and what permissions it needs
-//  kamen it sets up the keyboard shortcuts that i chose Ctrl+Shift+1 w hek
-
 {
   "manifest_version": 3,
   "name": "Simo Extension",
   "version": "1.0",
-  "description": "Thats to copy multiple items and paste them individually",
+  "description": "Copy multiple items and paste them individually with keyboard shortcuts",
   
   "permissions": [
     "storage",
@@ -29,69 +25,77 @@
   
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Multi-Clipboard Manager"
+    "default_title": "Simo Clipboard Manager"
   },
   
   "commands": {
     "paste-item-1": {
       "suggested_key": {
-        "default": "Ctrl+Shift+1"
+        "default": "Cmd+V",
+        "mac": "Ctrl+V"
       },
       "description": "Paste clipboard item 1"
     },
     "paste-item-2": {
       "suggested_key": {
-        "default": "Ctrl+Shift+2"
+        "default": "Cmd+2",
+        "mac": "Ctrl+2"
       },
       "description": "Paste clipboard item 2"
     },
     "paste-item-3": {
       "suggested_key": {
-        "default": "Ctrl+Shift+3"
+        "default": "Cmd+3",
+        "mac": "Ctrl+3"
       },
       "description": "Paste clipboard item 3"
     },
     "paste-item-4": {
       "suggested_key": {
-        "default": "Ctrl+Shift+4"
+        "default": "Cmd+4",
+        "mac": "Ctrl+4"
       },
       "description": "Paste clipboard item 4"
     },
     "paste-item-5": {
       "suggested_key": {
-        "default": "Ctrl+Shift+5"
+        "default": "Cmd+5",
+        "mac": "Ctrl+5"
       },
       "description": "Paste clipboard item 5"
     },
     "paste-item-6": {
       "suggested_key": {
-        "default": "Ctrl+Shift+6"
+        "default": "Cmd+6",
+        "mac": "Ctrl+6"
       },
       "description": "Paste clipboard item 6"
     },
     "paste-item-7": {
       "suggested_key": {
-        "default": "Ctrl+Shift+7"
+        "default": "Cmd+7",
+        "mac": "Ctrl+7"
       },
       "description": "Paste clipboard item 7"
     },
     "paste-item-8": {
       "suggested_key": {
-        "default": "Ctrl+Shift+8"
+        "default": "Cmd+8",
+        "mac": "Ctrl+8"
       },
       "description": "Paste clipboard item 8"
     },
-
-        "paste-item-9": {
+    "paste-item-9": {
       "suggested_key": {
-        "default": "Ctrl+Shift+9"
+        "default": "Cmd+9",
+        "mac": "Ctrl+9"
       },
       "description": "Paste clipboard item 9"
     },
-    
     "clear-clipboard": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Delete"
+        "default": "Ctrl+Shift+Delete",
+        "mac": "Cmd+Shift+Delete"
       },
       "description": "Clear all clipboard items"
     }

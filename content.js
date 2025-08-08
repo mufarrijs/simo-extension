@@ -1,10 +1,7 @@
-// Content script to monitor copy events
 let lastClipboardContent = '';
 
-// Monitor copy events
 document.addEventListener('copy', async (e) => {
   try {
-    // Small delay to ensure clipboard is updated
     setTimeout(async () => {
       try {
         const text = await navigator.clipboard.readText();
@@ -24,7 +21,6 @@ document.addEventListener('copy', async (e) => {
   }
 });
 
-// Also monitor keyboard shortcuts for copy
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
     setTimeout(async () => {
@@ -44,9 +40,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Listen for messages from background script
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'updatePopup') {
-    // This will be handled by popup.js if popup is open
+   
   }
 });

@@ -1,3 +1,11 @@
+<!--
+  
+  basically it creates the little window that opens when u click the extension icon
+ + shows you all your copied items in a nice list
+AHMAMAA CHI Has the "clear all" button
+mini-app interface u  see
+-->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -110,15 +118,16 @@
 </head>
 <body>
   <div class="header">
-    <h1>Multi-Clipboard</h1>
+    <h1>Simo Clipboard</h1>
     <button id="clearAll" class="clear-btn">Clear All</button>
   </div>
   
   <div id="clipboardItems"></div>
   
   <div class="shortcuts">
-    <div class="shortcut-info"><strong>Paste shortcuts:</strong> Ctrl+Shift+1-8</div>
-    <div class="shortcut-info"><strong>Clear all:</strong> Ctrl+Shift+Delete</div>
+    <div class="shortcut-info"><strong>Mac:</strong> Ctrl+V (item 1), Ctrl+2-9</div>
+    <div class="shortcut-info"><strong>PC:</strong> Cmd+V (item 1), Cmd+2-9</div>
+    <div class="shortcut-info"><strong>Clear:</strong> Cmd/Ctrl+Shift+Delete</div>
   </div>
   
   <script src="popup.js"></script>
