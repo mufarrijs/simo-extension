@@ -13,8 +13,8 @@
 --   Cmd+Shift+X               clear all slots
 --   Cmd+Ctrl+Shift+Del        clear history
 
--- Hide Hammerspoon's own hammer icon — only :) shows in the menu bar
-hs.menuIcon(false)
+-- Keep Hammerspoon's hammer icon visible as a backup reload/console access point
+-- hs.menuIcon(false)  ← disabled: without this, if :) breaks there's no way to reload
 
 -- Smaller, subtler alerts
 hs.alert.defaultStyle.textSize   = 13
@@ -180,12 +180,16 @@ local PANEL_HTML = [==[
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
+html,body{height:100%;overflow:hidden;background:transparent}
 body{
   font-family:-apple-system,'SF Pro Text',sans-serif;
   background:#fff;color:#1a1a1a;
   width:360px;display:flex;flex-direction:column;
   -webkit-user-select:none;
+  border-radius:14px;
+  border:1.5px solid #f48fb1;
+  box-shadow:0 8px 32px rgba(0,0,0,0.18),0 0 0 0.5px rgba(233,30,140,0.15);
+  overflow:hidden;
 }
 /* header */
 .hdr{padding:14px 16px 10px;border-bottom:1px solid #fce4ec;flex:none}
@@ -344,6 +348,11 @@ local function closePanel()
 end
 
 local function showPanel()
+    local ok, err = pcall(_showPanel)
+    if not ok then hs.alert.show("Panel error: "..tostring(err), 5) end
+end
+
+_showPanel = function()
     -- Toggle
     if S.panel and S.panel:isShowing() then closePanel(); return end
     closePanel()
@@ -375,8 +384,7 @@ local function showPanel()
     local y=scr.y+28
 
     S.panel=hs.webview.new({x=x,y=y,w=W,h=H},{},S.panelUC)
-    -- 1=titled, 2=closable, 32768=fullSizeContentView
-    S.panel:windowStyle(1 + 2 + 32768)
+    S.panel:windowStyle(1 + 2 + 32768)  -- titled + closable + fullSizeContentView
     S.panel:level(hs.canvas.windowLevels.floating)
     S.panel:html(PANEL_HTML)
     S.panel:show()
@@ -586,16 +594,43 @@ end
 -- ── Menu bar ───────────────────────────────────────────────────────────────────
 
 local function buildMenubar()
-    S.menubar=hs.menubar.new()
+    if S.menubar then S.menubar:delete() end
+    S.menubar = hs.menubar.new()
+    if not S.menubar then
+        hs.alert.show("SimoClip: menubar failed to create!", 5)
+        return
+    end
     S.menubar:setTitle(" :) ")
-    S.menubar:setMenu({
-        { title="Open Panel",   fn=showPanel },
-        { title="-" },
-        { title="Reload Config", fn=function() hs.reload() end },
-        { title="Preferences…",  fn=function() hs.openPreferences() end },
-        { title="-" },
-        { title="Quit SimoClip", fn=function() hs.quit() end },
-    })
+    S.menubar:setMenu(function()
+        local slotCount = 0
+        for i=0,9 do if S.slots[i] then slotCount=slotCount+1 end end
+        return {
+            { title = "Open Panel",    fn = showPanel },
+            { title = "-" },
+            { title = string.format("Clear Slots (%d/10 used)", slotCount), fn = function()
+                local btn = hs.dialog.blockAlert("Clear all slots?", "C0–C9 will be erased. History kept.", "Clear", "Cancel")
+                if btn == "Clear" then clearAllSlots() end
+            end },
+            { title = string.format("Clear History (%d entries)", #S.history), fn = function()
+                local btn = hs.dialog.blockAlert("Clear all history?", string.format("%d entries will be deleted. Slots kept.", #S.history), "Clear", "Cancel")
+                if btn == "Clear" then
+                    S.history = {}; lastHistContent = nil; saveHistory()
+                    hs.alert.show("History cleared", 1.5)
+                end
+            end },
+            { title = "Clear Everything", fn = function()
+                local btn = hs.dialog.blockAlert("Clear all slots AND history?", "This wipes everything. Cannot be undone.", "Clear All", "Cancel")
+                if btn == "Clear All" then
+                    for i=0,9 do S.slots[i]=nil end; saveSlots()
+                    S.history = {}; lastHistContent = nil; saveHistory()
+                    hs.alert.show("All data cleared", 1.5)
+                end
+            end },
+            { title = "-" },
+            { title = "Reload Config", fn = function() hs.reload() end },
+            { title = "Quit SimoClip", fn = function() hs.quit() end },
+        }
+    end)
 end
 
 -- ── Global hotkeys ─────────────────────────────────────────────────────────────
@@ -626,11 +661,18 @@ end)
 
 -- ── Boot ───────────────────────────────────────────────────────────────────────
 
-hs.fs.mkdir(CFG.dataDir)
-loadSlots()
-loadHistory()
-startTap()
-startWatcher()
-buildMenubar()
+local ok, err = pcall(function()
+    hs.fs.mkdir(CFG.dataDir)
+    loadSlots()
+    loadHistory()
+    startTap()
+    startWatcher()
+    buildMenubar()
+end)
 
-hs.alert.show("SimoClip ready  ·  click  :)  in menu bar",2.5)
+if ok then
+    hs.alert.show("SimoClip v2 ready  ·  click  :)  in menu bar", 3)
+else
+    hs.alert.show("SimoClip BOOT ERROR: " .. tostring(err), 8)
+    print("SimoClip boot error: " .. tostring(err))
+end
