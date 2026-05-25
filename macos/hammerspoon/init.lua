@@ -588,7 +588,14 @@ end
 local function buildMenubar()
     S.menubar=hs.menubar.new()
     S.menubar:setTitle(" :) ")
-    S.menubar:setClickCallback(showPanel)
+    S.menubar:setMenu({
+        { title="Open Panel",   fn=showPanel },
+        { title="-" },
+        { title="Reload Config", fn=function() hs.reload() end },
+        { title="Preferences…",  fn=function() hs.openPreferences() end },
+        { title="-" },
+        { title="Quit SimoClip", fn=function() hs.quit() end },
+    })
 end
 
 -- ── Global hotkeys ─────────────────────────────────────────────────────────────
