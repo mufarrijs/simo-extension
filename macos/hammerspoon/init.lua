@@ -180,42 +180,75 @@ local PANEL_HTML = [==[
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,sans-serif;background:#0e0e16;color:#dde;width:360px;overflow:hidden;-webkit-user-select:none}
-.hdr{padding:12px 14px 10px;border-bottom:1px solid #1a1a28}
-.logo{font-size:15px;font-weight:700;letter-spacing:.5px}
-.sub{font-size:10px;color:#383848;margin-top:3px}
-.tabs{display:flex;border-bottom:1px solid #1a1a28}
-.tab{flex:1;padding:9px;border:none;background:transparent;color:#445;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
-.tab.on{color:#7aa;border-bottom-color:#5899aa}
-.pane{display:none}.pane.on{display:block}
-.sl{padding:4px 8px}
-.row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer}
-.row:hover{background:#161622}
-.key{font:600 11px/1 monospace;color:#445;min-width:22px}
-.prv{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#bbc}
-.prv.emp{color:#2a2a38;font-style:italic}
-.pbtn{font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid #223;background:#151f2e;color:#6af;cursor:pointer;font-family:inherit}
-.pbtn:hover{background:#1e2e40}
-.hl{overflow-y:auto;max-height:480px;padding:4px 8px}
-.hr{padding:6px 8px;border-radius:7px;cursor:pointer}
-.hr:hover{background:#161622}
-.hp{font-size:12px;color:#bbc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hm{font-size:10px;color:#334;margin-top:2px}
-.empty{text-align:center;padding:40px;color:#2a2a38;font-size:13px}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-thumb{background:#222232;border-radius:2px}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:-apple-system,'SF Pro Text',sans-serif;
+  background:#fff;color:#1a1a1a;
+  width:360px;display:flex;flex-direction:column;
+  -webkit-user-select:none;
+}
+/* header */
+.hdr{padding:14px 16px 10px;border-bottom:1px solid #fce4ec;flex:none}
+.logo{font-size:15px;font-weight:700;color:#e91e8c}
+.sub{font-size:10px;color:#f48fb1;margin-top:3px}
+/* tabs */
+.tabs{display:flex;border-bottom:2px solid #fce4ec;flex:none}
+.tab{
+  flex:1;padding:10px;border:none;background:#fff;
+  color:#f48fb1;font-size:12px;font-weight:700;
+  cursor:pointer;border-bottom:2px solid transparent;
+  margin-bottom:-2px;transition:color .15s,border-color .15s;
+}
+.tab:hover{color:#e91e8c}
+.tab.on{color:#e91e8c;border-bottom-color:#e91e8c}
+/* panes — fill remaining height and scroll */
+.pane{display:none;flex:1;overflow-y:auto}
+.pane.on{display:block}
+/* history rows */
+.hr{
+  padding:10px 16px;border-bottom:1px solid #fce4ec;
+  cursor:pointer;transition:background .1s;
+}
+.hr:hover{background:#fff0f7}
+.hp{font-size:13px;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hm{font-size:10px;color:#f48fb1;margin-top:3px}
+/* slot rows */
+.row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;border-bottom:1px solid #fce4ec;
+  transition:background .1s;
+}
+.row:not(.empty){cursor:pointer}
+.row:not(.empty):hover{background:#fff0f7}
+.key{font:700 11px/1 monospace;min-width:24px}
+.key.has{color:#e91e8c}
+.key.emp{color:#f8bbd0}
+.prv{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prv.emp{color:#f8bbd0;font-style:italic;font-size:12px}
+.pbtn{
+  font-size:11px;padding:5px 12px;border-radius:20px;border:none;
+  background:#e91e8c;color:#fff;cursor:pointer;
+  font-family:inherit;font-weight:700;white-space:nowrap;
+  transition:background .1s;
+}
+.pbtn:hover{background:#c2185b}
+.empty-msg{text-align:center;padding:50px 24px;color:#f8bbd0;font-size:13px;line-height:1.6}
+/* scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#fff}
+::-webkit-scrollbar-thumb{background:#f8bbd0;border-radius:2px}
 </style></head>
 <body>
 <div class="hdr">
   <div class="logo">:) SimoClip</div>
-  <div class="sub">Cmd+C then Cmd+0–9 to save &nbsp;·&nbsp; Cmd+B then Cmd+0–9 to paste</div>
+  <div class="sub">Cmd+C → Cmd+0–9 to save &nbsp;·&nbsp; Cmd+B → Cmd+0–9 to paste</div>
 </div>
 <div class="tabs">
-  <button class="tab on" onclick="doTab('hist',this)">History</button>
-  <button class="tab"    onclick="doTab('slots',this)">Slots</button>
+  <button class="tab on"  onclick="doTab('hist',this)">History</button>
+  <button class="tab"     onclick="doTab('slots',this)">Slots</button>
 </div>
-<div id="hist"  class="pane on"><div class="hl" id="hl"></div></div>
-<div id="slots" class="pane">  <div class="sl" id="sl"></div></div>
+<div id="hist"  class="pane on"></div>
+<div id="slots" class="pane"></div>
 <script>
 var histArr=[];
 function doTab(id,el){
@@ -229,36 +262,49 @@ function post(o){window.webkit.messageHandlers.simoclip.postMessage(o)}
 function renderSlots(data){
   var h='';
   for(var i=0;i<=9;i++){
-    var s=data[String(i)];var empty=!s;
+    var s=data[String(i)]; var empty=!s;
     var icon=s?(s.t==='url'?'🔗 ':s.t==='image'?'🖼 ':''):'';
     h+='<div class="row'+(empty?' empty':'')+'"'
       +(!empty?' onclick="post({a:\'paste\',slot:'+i+'})"':'')+'>'+
-      '<span class="key">C'+i+'</span>'+
+      '<span class="key '+(empty?'emp':'has')+'">C'+i+'</span>'+
       '<span class="prv'+(empty?' emp':'')+'">'+xe(empty?'empty':icon+s.p)+'</span>'+
       (!empty?'<button class="pbtn" onclick="event.stopPropagation();post({a:\'paste\',slot:'+i+'})">Paste</button>':'')+
       '</div>';
   }
-  document.getElementById('sl').innerHTML=h;
+  document.getElementById('slots').innerHTML=h;
 }
 function renderHist(data){
   histArr=data;
-  if(!data||!data.length){document.getElementById('hl').innerHTML='<div class="empty">No history yet</div>';return}
+  var el=document.getElementById('hist');
+  if(!data||!data.length){
+    el.innerHTML='<div class="empty-msg">No history yet.<br>Copy anything with Cmd+C<br>and it will show up here.</div>';
+    return;
+  }
   var h='';
   data.forEach(function(e,i){
-    var sl=e.s!=null?' [C'+e.s+']':'';
+    var slot=e.s!=null?' · C'+e.s:'';
     var ic=e.t==='url'?'🔗 ':e.t==='image'?'🖼 ':'';
     h+='<div class="hr" onclick="copyHist('+i+')">'+
       '<div class="hp">'+xe(ic+e.p)+'</div>'+
-      '<div class="hm">'+xe(e.d)+xe(sl)+(e.a?' &nbsp;·&nbsp; '+xe(e.a):'')+'</div>'+
+      '<div class="hm">'+xe(e.d)+xe(slot)+(e.a?' · '+xe(e.a):'')+'</div>'+
       '</div>';
   });
-  document.getElementById('hl').innerHTML=h;
+  el.innerHTML=h;
 }
 function copyHist(i){
   var e=histArr[i];
-  if(e&&e.c)post({a:'copy',content:e.c});
+  if(e&&e.c) post({a:'copy',content:e.c});
 }
-window._init=function(sj,hj){renderSlots(JSON.parse(sj));renderHist(JSON.parse(hj))};
+// UTF-8 safe base64 decode
+function b64d(s){
+  return decodeURIComponent(atob(s).split('').map(function(c){
+    return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+}
+window._init=function(sb,hb){
+  renderSlots(JSON.parse(b64d(sb)));
+  renderHist(JSON.parse(b64d(hb)));
+};
 </script></body></html>
 ]==]
 
@@ -287,9 +333,9 @@ local function buildHistData()
     return hs.json.encode(out)
 end
 
-local function jsonForJs(s)
-    -- Only need to escape single-quotes; JSON handles everything else
-    return s:gsub("'","\\'")
+local function b64(s)
+    -- Base64-encode so any content (emoji, quotes, backslashes) is safe to embed in JS
+    return (hs.base64.encode(s):gsub("\n",""))
 end
 
 local function closePanel()
@@ -335,11 +381,11 @@ local function showPanel()
     S.panel:html(PANEL_HTML)
     S.panel:show()
 
-    -- Inject live data after page renders
-    hs.timer.doAfter(0.35,function()
+    -- Inject live data after page renders (base64 avoids all escaping issues)
+    hs.timer.doAfter(0.4,function()
         if S.panel then
             S.panel:evaluateJavaScript(
-                "window._init('"..jsonForJs(buildSlotData()).."','"..jsonForJs(buildHistData()).."')"
+                "window._init('"..b64(buildSlotData()).."','"..b64(buildHistData()).."')"
             )
         end
     end)
