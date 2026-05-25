@@ -1,0 +1,8 @@
+json is so anal with comments so
+
+1- the manifest file is the file that tells chrome what my extension is called
+and what it can do and what permissions it needs
+kamen it sets up the keyboard shortcuts that i chose Ctrl+Shift+1 w hek
+
+2-
+
